@@ -576,4 +576,13 @@ atOffsetFromCenter:(CGPoint)offset
     return self.containerView.subviews.lastObject;
 }
 
+- (void)popTopView {
+    UIView *topSwipeableView = [self topSwipeableView];
+    if (!topSwipeableView) {
+        return;
+    }
+
+    [topSwipeableView removeFromSuperview];
+}
+
 @end

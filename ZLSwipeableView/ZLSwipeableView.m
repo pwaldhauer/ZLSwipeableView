@@ -82,7 +82,7 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
 
     // Default properties
     self.isRotationEnabled = YES;
-    self.rotationDegree = 1;
+    self.rotationDegree = 0;
     self.rotationRelativeYOffsetFromCenter = 0.3;
 
     self.direction = ZLSwipeableViewDirectionAll;
@@ -194,6 +194,8 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
     }
 
     if (self.isRotationEnabled) {
+        CGPoint rotationCenterOffset = {
+            0, 0 };
         // rotation
         NSUInteger numSwipeableViews = self.containerView.subviews.count;
         if (numSwipeableViews >= 1) {
@@ -204,19 +206,21 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
                                  toPoint:self.swipeableViewsCenter];
             [self.animator addBehavior:self.swipeableViewSnapBehavior];
         }
-        CGPoint rotationCenterOffset = {
-            0, CGRectGetHeight(topSwipeableView.frame) *
-                self.rotationRelativeYOffsetFromCenter};
         if (numSwipeableViews >= 2) {
+
             [self rotateView:self.containerView.subviews[numSwipeableViews - 2]
                    forDegree:self.rotationDegree
           atOffsetFromCenter:rotationCenterOffset
+             viewNumber:2
                     animated:YES];
         }
         if (numSwipeableViews >= 3) {
+
             [self rotateView:self.containerView.subviews[numSwipeableViews - 3]
                    forDegree:-self.rotationDegree
           atOffsetFromCenter:rotationCenterOffset
+
+                  viewNumber:3
                     animated:YES];
         }
     }
@@ -556,19 +560,15 @@ int signum(CGFloat n) {
 - (void)rotateView:(UIView *)view
          forDegree:(float)degree
 atOffsetFromCenter:(CGPoint)offset
+        viewNumber:(NSInteger)number
           animated:(BOOL)animated {
     float duration = animated ? 0.4 : 0;
     float rotationRadian = [self degreesToRadians:degree];
     [UIView animateWithDuration:duration animations:^{
-        view.center = self.swipeableViewsCenter;
         CGAffineTransform transform =
-            CGAffineTransformMakeTranslation(offset.x,
-                offset.y);
-        transform =
-            CGAffineTransformRotate(transform, rotationRadian);
-        transform = CGAffineTransformTranslate(
-            transform, -offset.x, -offset.y);
-        view.transform = transform;
+            CGAffineTransformMakeTranslation(offset.x, offset.y + (number-1) * 3);
+        transform = CGAffineTransformScale(transform, 1 - (0.02*(number-1)), 1);
+               view.transform = transform;
     }];
 }
 
